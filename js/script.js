@@ -24,11 +24,14 @@ Array.prototype.remove = function(elem) {
 var canvas = document.getElementById("canvas")
 var context = canvas.getContext("2d");
 
-CARD_WIDTH = 200;
-CARD_HEIGHT = 200;
+var CARD_WIDTH = 200;
+var CARD_HEIGHT = 200;
+var CHARACTER_WIDTH = 156;
+var CHARACTER_HEIGHT = 156;
+
 
 var cardElementArray = [];
-var commonElementArray = [];
+var commonElementArray = {};
 
 var CARD_INTERVAL = 50;
 
@@ -38,8 +41,8 @@ var hit = document.getElementById("hit");
 var stand = document.getElementById("stand");
 
 var rabbit = new Sprite("rabbit", new ImagePainter("srcs/character/rabbit01.png"));
-rabbit.width = 200;
-rabbit.height = 200;
+rabbit.width = 156;
+rabbit.height = 156;
 rabbit.top = 300;
 
 var panda = new Sprite("panda", new ImagePainter("srcs/character/panda01.png"));
@@ -56,9 +59,9 @@ blackJack.height = 200;
 blackJack.top = 300;
 blackJack.left = 150;
 
-commonElementArray.push(rabbit);
-commonElementArray.push(panda);
-commonElementArray.push(blackJack);
+// commonElementArray.push(rabbit);
+// commonElementArray.push(panda);
+// commonElementArray.push(blackJack);
 
 var mailBox = new MailBox();
 
@@ -92,7 +95,12 @@ for(var i = 0, length = cardsArray.length; i < length; i++) {
 
 logic.addHandler("toggleHit", function(args) {
 
-	var youCardIndex = getRandom({"start" : 0, "end": 51});;
+	// console.log("卡的实际值 : " + cardvalue);
+	// console.log("卡的数组索引 : " + youCardIndex);
+	// console.log("卡的纵向索引 : " + Math.floor(youCardIndex/13));
+	// console.log("卡的横向索引 : " + youCardIndex%13);
+
+	var youCardIndex = getRandom({"start" : 0, "end": 51});
 	while (cardsArray[youCardIndex] === 0) {
 		youCardIndex = getRandom({"start" : 0, "end": 51});
 	}
@@ -100,10 +108,6 @@ logic.addHandler("toggleHit", function(args) {
 
 	cardsArray[youCardIndex] = 0;
 
-	// console.log("卡的实际值 : " + cardvalue);
-	// console.log("卡的数组索引 : " + youCardIndex);
-	// console.log("卡的纵向索引 : " + Math.floor(youCardIndex/13));
-	// console.log("卡的横向索引 : " + youCardIndex%13)
 
 	if(cardvalue === 1) {
 		if((youCardValueSum + 10) <= 21) {
@@ -115,8 +119,12 @@ logic.addHandler("toggleHit", function(args) {
 
 	youCardValueSum += cardvalue;
 
-	console.log(cardvalue);
-	console.log(youCardValueSum);
+	if(youCardValueSum > 21) {
+
+
+	} else if (youCardValueSum === 21) {
+
+	}
 
 	logic.send("youCardView_drawCard", {"index" : youCardIndex});
 
@@ -126,6 +134,16 @@ logic.addHandler("toggleHit", function(args) {
 		dealerCardViewLock = true;
 	}
 	
+
+	var youIndex = getRandom({"start" : 0, "end": 4});
+	var dealerIndex = getRandom({"start" : 0, "end": 4});
+
+	logic.send("youView_drawCharacter", {"index" : youIndex});
+	youView.receive("youView_drawCharacter");
+	logic.send("dealerView_drawCharacter", {"index" : dealerIndex});
+	dealerView.receive("dealerView_drawCharacter")
+
+
 	youCardView.receive("youCardView_drawCard");
 	// dealerCardView.receive("dealearCardView_drawCard");
 	dealerCardView.receive("dealearCardView_drawBlindCard");
@@ -144,8 +162,19 @@ cardsImage.src = "srcs/cards.png";
 var blindCardImage = new Image();
 blindCardImage.src = "srcs/back.png";
 
+var pandaImage = new Image();
+pandaImage.src = "srcs/character/panda.png";
+var rabbitImage = new Image();
+rabbitImage.src = "srcs/character/rabbit.png";
+
+
+
 var dealerCardView = new View({"mailBox" : mailBox, "left" : 0, "top" : 0});
 var youCardView = new View({"mailBox" : mailBox, "left" : 400, "top" : 0});
+
+
+var dealerView = new View({"mailBox" : mailBox, "left" : 0, "top" : 0});
+var youView = new View({"mailBox" : mailBox, "left" : 0, "top" : 0});
 
 
 function drawOneCard(args) {
@@ -160,7 +189,7 @@ function drawOneCard(args) {
 	var cardLeft = _this.cardLeft;
 	var cardTop = _this.cardTop;
 
-	var card02 = new Sprite('card02', new SpritePainter(cardsImage), [ new moveXDistance(100), new spriteIt(index) ]);
+	var card02 = new Sprite('card02', new SpritePainter({"type" : "card", "image" : cardsImage, "width" : CARD_WIDTH, "height" : CARD_HEIGHT}), [ new moveXDistance(100), new spriteIt(index) ]);
 	card02.left = left + cardLeft;
 	card02.top = top + cardTop;
 
@@ -221,7 +250,7 @@ function drawBlindTwoCard () {
 	cardLeft = _this.cardLeft;
 	cardTop = _this.cardTop;
 
-	var seenCard = new Sprite('seenCard', new SpritePainter(cardsImage), [ new moveXDistance(100), new spriteIt(index) ]);
+	var seenCard = new Sprite('seenCard', new SpritePainter({"type" : "card", "image" : cardsImage, "width" : CARD_WIDTH, "height" : CARD_HEIGHT}), [ new moveXDistance(100), new spriteIt(index) ]);
 	seenCard.left = left + cardLeft;
 	seenCard.top = top + cardTop;
 
@@ -259,6 +288,25 @@ dealerCardView.addHandler("drawCard", drawOneCard)
 		   })
 		   	  .addHandler("drawBlindCard", drawBlindTwoCard);
 
+youView.addHandler("drawCharacter", function(args) {
+
+				var index = args.index || 0;
+				var character = new Sprite('character', new SpritePainter({"image" : pandaImage, "width" : CHARACTER_WIDTH, "height" : CHARACTER_HEIGHT}), [ new spriteIt(index) ]);
+				character.top = 320;
+				character.left = 640;
+				commonElementArray.you = character;
+		   });
+
+dealerView.addHandler("drawCharacter", function(args) {
+
+				var index = args.index || 0;
+				var character = new Sprite('character', new SpritePainter({"image" : rabbitImage, "width" : CHARACTER_WIDTH, "height" : CHARACTER_HEIGHT}), [ new spriteIt(index) ]);
+				character.top = 320;
+				character.left = 0;
+				commonElementArray.dealer = character;
+		   });
+
+
 hit.onclick = function () {
 
 	logic.toggle("logic_toggleHit", {});
@@ -284,7 +332,7 @@ function animate(time) {
 			cardElementArray[i].update(context, time).paint(context);
 		}
 
-		for(var i = 0; i < commonElementArray.length; i++) {
+		for(var i in commonElementArray) {
 			commonElementArray[i].update(context, time).paint(context);
 		}
 

@@ -21,21 +21,57 @@ ImagePainter.prototype = {
 
 
 // 雪碧图绘制器
-var SpritePainter = function (image) {
-	this.image = image;
-	this.IMAGE_WIDTH = 200;
-	this.IMAGE_HEIGHT = 200;
-}
+var SpritePainter = function (args) {
+	this.image = args.image;
+	this.IMAGE_HEIGHT = args.height;
+	this.IMAGE_WIDTH = args.width;
+	this.type = args.type || "normal";
+};
 
 SpritePainter.prototype = {
 
 	figure: function (index) {
 
-		// y位置索引 
-		var y = this.IMAGE_HEIGHT * Math.floor(index/13);
+		if (this.type === "card") {
+			// y位置索引 
+			var y = this.IMAGE_HEIGHT * Math.floor(index/13);
+
+			// x位置索引
+			var x = this.IMAGE_WIDTH * (index%13);
+
+			this.cell = {"x" : x, "y" : y, "w" : this.IMAGE_WIDTH, "h" : this.IMAGE_HEIGHT};
+		} else if (this.type === "normal") {
+
+			var x = this.IMAGE_WIDTH * index;
+			var y = 0;
+			this.cell = {"x" : x, "y" : y, "w" : this.IMAGE_WIDTH, "h" : this.IMAGE_HEIGHT};
+		}
+	},
+
+	paint: function (sprite, context) {
+
+		if(this.image.complete) {
+			var image = this.image;
+			var cell = this.cell;
+			context.drawImage(image, cell.x, cell.y, cell.w, cell.h, sprite.left, sprite.top, cell.w, cell.h);
+		}
+	}
+};
+
+// 需要聚合
+var SpritePainter1 = function (image) {
+	this.image = image;
+	this.IMAGE_WIDTH = 200;
+	this.IMAGE_HEIGHT = 200;
+};
+
+SpritePainter1.prototype = {
+
+	figure: function (index) {
 
 		// x位置索引
-		var x = this.IMAGE_WIDTH * (index%13);
+		var x = this.IMAGE_WIDTH * (index);
+		var y = 0;
 
 		this.cell = {"x" : x, "y" : y, "w" : this.IMAGE_WIDTH, "h" : this.IMAGE_HEIGHT};
 	},
@@ -48,7 +84,7 @@ SpritePainter.prototype = {
 			context.drawImage(image, cell.x, cell.y, cell.w, cell.h, sprite.left, sprite.top, cell.w, cell.h);
 		}
 	}
-}
+};
 
 
 // 帧动画绘制器
