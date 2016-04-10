@@ -30,7 +30,6 @@ CARD_HEIGHT = 200;
 var cardElementArray = [];
 var commonElementArray = [];
 
-var CARD_VIEW_TOP = 50;
 var CARD_INTERVAL = 50;
 
 var FPS = 35;
@@ -53,6 +52,7 @@ commonElementArray.push(rabbit);
 commonElementArray.push(panda);
 
 var mailBox = new MailBox();
+
 var logic = new Logic({"mailBox" : mailBox});
 logic.addHandler("toggleHit", function(args) {
 	logic.send("youCardView_drawCard", {})
@@ -99,8 +99,9 @@ function drawOneCard(args) {
 		card02.top = top + cardTop;
 	}
 
-	card02.width = 100;
-	card02.height = CARD_HEIGHT;
+	card02.width = 200;
+	card02.height = 200;
+	
 	card02.velocityX = 300;
 	cardElementArray.push(card02);
 	_this.cardLeft += CARD_INTERVAL;
