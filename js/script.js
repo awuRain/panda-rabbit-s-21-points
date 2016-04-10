@@ -24,15 +24,13 @@ Array.prototype.remove = function(elem) {
 var canvas = document.getElementById("canvas")
 var context = canvas.getContext("2d");
 
-CARD_WIDTH = 170;
-CARD_HEIGHT = 170;
+CARD_WIDTH = 200;
+CARD_HEIGHT = 200;
 
 var cardElementArray = [];
 var commonElementArray = [];
 
-var CARD_VIEW_LEFT = 200;
 var CARD_VIEW_TOP = 50;
-var cardLeft = CARD_VIEW_LEFT; 
 var CARD_INTERVAL = 50;
 
 var FPS = 35;
@@ -43,34 +41,93 @@ var stand = document.getElementById("stand");
 var rabbit = new Sprite("rabbit", new ImagePainter("srcs/character/rabbit01.png"));
 rabbit.width = 200;
 rabbit.height = 200;
-rabbit.top = 200;
+rabbit.top = 300;
 
 var panda = new Sprite("panda", new ImagePainter("srcs/character/panda01.png"));
 panda.width = 200;
 panda.height = 200;
-panda.top = 200;
+panda.top = 300;
 panda.left = 600;
 
 commonElementArray.push(rabbit);
 commonElementArray.push(panda);
 
-hit.onclick = function () {
+var mailBox = new MailBox();
+var logic = new Logic({"mailBox" : mailBox});
+logic.addHandler("toggleHit", function(args) {
+	logic.send("youCardView_drawCard", {})
+		 .send("dealearCardView_drawCard");
+
+	youCardView.receive("youCardView_drawCard");
+	dealerCardView.receive("dealearCardView_drawCard");
+}).addHandler("toggleStand", function(args) {
+	logic.send("youCardView_clear", {});
+	youCardView.receive("youCardView_clear");
+	logic.send("delearCardView_clear", {});
+	dealerCardView.receive("delearCardView_clear");
+})
+
+var cardsImage = new Image();
+cardsImage.src = "srcs/cards.png";
+
+var dealerCardView = new View({"mailBox" : mailBox, "left" : 0, "top" : 0});
+var youCardView = new View({"mailBox" : mailBox, "left" : 400, "top" : 0});
+
+
+function drawOneCard(args) {
 
 	var index = getRandom({"start" : 0, "end": 51});
 
-	var card02 = new Sprite('card01', new SpritePainter("srcs/cards.png"), [ new moveXDistance(100), new spriteIt(index) ]);
-	card02.left = cardLeft;
-	card02.top = CARD_VIEW_TOP;
-	card02.width = CARD_WIDTH;
+	var _this = this._this
+
+	var left = _this.left;
+	var top = _this.top;
+	var cardLeft = _this.cardLeft;
+	var cardTop = _this.cardTop;
+
+	var card02 = new Sprite('card02', new SpritePainter(cardsImage), [ new moveXDistance(100), new spriteIt(index) ]);
+	card02.left = left + cardLeft;
+	card02.top = top + cardTop;
+
+	if(cardLeft > 300) {
+
+		_this.cardLeft = _this.CARD_VIEW_LEFT;
+		cardLeft = _this.cardLeft;
+		_this.cardTop += 50;
+		cardTop = _this.cardTop;
+		card02.left = left + cardLeft;
+		card02.top = top + cardTop;
+	}
+
+	card02.width = 100;
 	card02.height = CARD_HEIGHT;
 	card02.velocityX = 300;
 	cardElementArray.push(card02);
-	cardLeft += CARD_INTERVAL;
+	_this.cardLeft += CARD_INTERVAL;
+}
+
+youCardView.addHandler("drawCard", drawOneCard)
+		   .addHandler("clear", function(args) {
+				cardElementArray = [];
+				var _this = this._this;
+				_this.reset();
+});
+
+dealerCardView.addHandler("drawCard", drawOneCard)
+		   	  .addHandler("clear", function(args) {
+				cardElementArray = [];
+				var _this = this._this;
+				_this.reset();
+});
+
+hit.onclick = function () {
+
+	logic.toggle("logic_toggleHit", {});
+	
 };
 
 stand.onclick = function () {
-	cardElementArray = [];
-	cardLeft = CARD_VIEW_LEFT;
+	logic.toggle("logic_toggleStand", {});
 };
 
 
@@ -96,15 +153,6 @@ function animate(time) {
 	}
 	
 	requestAnimFrame(animate);
-}
-
-
-var mailBox = new MailBox();
-var view1 = new View({"mailBox" : mailBox});
-var view2 = new View({"mailBox" : mailBox});
-
-view1.send("module2_doThing", {"arg1" : 1});
-view2.receive("module2_doThing");
-
+};
 
 requestAnimFrame(animate);

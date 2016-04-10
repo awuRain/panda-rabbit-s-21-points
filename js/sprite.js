@@ -36,7 +36,9 @@ Sprite.prototype = {
 		}
 		return this;
 	}
-};var Sprite = function (name, painter, behaviors) {
+};
+
+var Sprite = function (name, painter, behaviors) {
 
 	if(name !== undefined) {
 		this.name = name;
