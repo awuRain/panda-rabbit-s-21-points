@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<style type="text/css">
+		body {
+			background: #eee;
+			padding: 0px;
+			margin: 0px;
+		}
+		#wrapper {
+			position: relative;
+			margin: 0px auto;
+			width: 800px;
+			height: 500px;
+		}
+
+		#canvas {
+			/*background: #fff;*/
+			position: absolute;
+			width: 800px;
+			height: 500px;
+			left: 0px;
+			right: 0px;
+			z-index: 10;
+		}
+
+		#hit, #stand {
+			position: absolute;
+			top: 400px;
+			right : 110px;
+			border:none;width:120px;height:120px;
+			z-index: 11;
+			background: url(srcs/hit.png) no-repeat;
+		}
+
+		#hit {
+			background: url(srcs/hit.png) no-repeat;
+		}
+
+		#stand {
+			background: url(srcs/stand.png) no-repeat;
+			right: 0px;
+		}
+
+	</style>
+</head>
+<body>
+	<div id="wrapper">
+		<button id="hit"></button>
+		<button id="stand"></button>
+		<canvas id="canvas" width="800" height="500"></canvas>
+	</div>
+	
+	<script type="text/javascript" src="js/sprite.js"></script>
+	<script type="text/javascript" src="js/util.js"></script>
+	<script type="text/javascript" src="js/behavior.js"></script>
+	<script type="text/javascript" src="js/painter.js"></script>
+	<script type="text/javascript" src="js/script.js"></script>
+	<script type="text/javascript">
+
+		function addButtonAni (button) {
+
+			button.onmousedown = function() {
+				this.style.backgroundPosition = "-120px 0px";
+			};
+			button.onmouseup = function() {
+				this.style.backgroundPosition = "0px 0px";
+			};
+			button.onmouseout = function() {
+				this.style.backgroundPosition = "0px 0px";
+			};
+		} 
+
+		var hit = document.getElementById("hit");
+		addButtonAni(hit);
+
+		var stand = document.getElementById("stand");
+		addButtonAni(stand);
+
+	</script>
+</body>
+</html>
