@@ -30,8 +30,11 @@ var CHARACTER_WIDTH = 156;
 var CHARACTER_HEIGHT = 156;
 
 
-var cardElementArray = [];
-var commonElementArray = {};
+var cardGraphArray = {"you" : [], "dealer" : {"seenCard" : [], "blindCard" : []}};
+var yourCardArray = cardGraphArray.you;
+var seenCardArray = cardGraphArray.dealer.seenCard;
+var blindCardArray = cardGraphArray.dealer.blindCard;
+var commonGraphArray = {};
 
 var CARD_INTERVAL = 50;
 
@@ -48,9 +51,9 @@ blackJack.height = 200;
 blackJack.top = 300;
 blackJack.left = 150;
 
-// commonElementArray.push(rabbit);
-// commonElementArray.push(panda);
-// commonElementArray.push(blackJack);
+// commonGraphArray.push(rabbit);
+// commonGraphArray.push(panda);
+// commonGraphArray.push(blackJack);
 
 
 // 中心信息
@@ -68,7 +71,7 @@ var youInformationView = new View({"mailBox" : mailBox, "left" : 520, "top" : 42
 youInformationView.addHandler("draw", function (args) {
 	var _this = this._this;
 
-	commonElementArray.information = null;
+	commonGraphArray.information = null;
 
 	var texts = [
 		{"baseText" : "你当前的点数 : ", "text" : args.point},
@@ -78,12 +81,12 @@ youInformationView.addHandler("draw", function (args) {
 	var information = new Graph("information", new TextPainter(texts));
 	information.left = _this.left;
 	information.top = _this.top;
-	commonElementArray.information = information;
+	commonGraphArray.information = information;
 }).addHandler("reset", function (args) {
 
 	var _this = this._this;
 
-	commonElementArray.information = null;
+	commonGraphArray.information = null;
 
 	var texts = [
 		{"baseText" : "你当前的点数 : ", "text" : 0},
@@ -93,7 +96,7 @@ youInformationView.addHandler("draw", function (args) {
 	var information = new Graph("information", new TextPainter(texts));
 	information.left = _this.left;
 	information.top = _this.top;
-	commonElementArray.information = information;
+	commonGraphArray.information = information;
 });
 
 
@@ -211,6 +214,8 @@ logic.addHandler("toggleHit", function(args) {
 	cardsArray.reset();
 
 	youInformationView.toggle("reset", {"chip" : yourChip});
+
+	dealerCardView.toggle("drawSeenCard");
 });
 
 var cardsImage = new Image();
@@ -224,8 +229,6 @@ var rabbitImage = new Image();
 rabbitImage.src = "srcs/character/rabbit.png";
 
 
-
-
 function drawOneCard(args) {
 
 	var index = args["index"];
@@ -233,99 +236,70 @@ function drawOneCard(args) {
 	// 指向模块module
 	var _this = this._this
 
-	var left = _this.left;
-	var top = _this.top;
-	var cardLeft = _this.cardLeft;
-	var cardTop = _this.cardTop;
-
-	var card02 = new Graph('card02', new SpritePainter({"type" : "card", "image" : cardsImage, "width" : CARD_WIDTH, "height" : CARD_HEIGHT}), [ new moveXDistance(100), new spriteIt(index) ]);
-	card02.left = left + cardLeft;
-	card02.top = top + cardTop;
-
-	if(cardLeft > 300) {
-
-		_this.cardLeft = _this.CARD_VIEW_LEFT;
-		cardLeft = _this.cardLeft;
-		_this.cardTop += 50;
-		cardTop = _this.cardTop;
-		card02.left = left + cardLeft;
-		card02.top = top + cardTop;
-	}
-
-	card02.width = 200;
-	card02.height = 200;
-
-	card02.velocityX = 300;
-	cardElementArray.push(card02);
-	_this.cardLeft += CARD_INTERVAL;
+	drawcard(_this, index, yourCardArray);
 }
 
 function drawBlindTwoCard () {
 
-	var index = getRandom({"start" : 0, "end": 51});
-
 	// 指向模块module
 	var _this = this._this
 
-	var left = _this.left;
-	var top = _this.top;
-	var cardLeft = _this.cardLeft;
-	var cardTop = _this.cardTop;
-
-	var seenCard = new Graph('seenCard', new SpritePainter({"type" : "card", "image" : cardsImage, "width" : CARD_WIDTH, "height" : CARD_HEIGHT}), [ new moveXDistance(100), new spriteIt(index) ]);
-	seenCard.left = left + cardLeft;
-	seenCard.top = top + cardTop;
-
-	if(cardLeft > 300) {
-
-		_this.cardLeft = _this.CARD_VIEW_LEFT;
-		cardLeft = _this.cardLeft;
-		_this.cardTop += 50;
-		cardTop = _this.cardTop;
-		seenCard.left = left + cardLeft;
-		seenCard.top = top + cardTop;
-	}
-
-	seenCard.width = 200;
-	seenCard.height = 200;
-
-	seenCard.velocityX = 300;
-	cardElementArray.push(seenCard);
-	_this.cardLeft += CARD_INTERVAL;
-
-
-	left = _this.left;
-	top = _this.top;
-	cardLeft = _this.cardLeft;
-	cardTop = _this.cardTop;
-
-	var blindCard = new Graph('blindCard', new ImagePainter(blindCardImage), [ new moveXDistance(100) ]);
-	blindCard.left = left + cardLeft;
-	blindCard.top = top + cardTop;
-
-	if(cardLeft > 300) {
-
-		_this.cardLeft = _this.CARD_VIEW_LEFT;
-		cardLeft = _this.cardLeft;
-		_this.cardTop += 50;
-		cardTop = _this.cardTop;
-		blindCard.left = left + cardLeft;
-		blindCard.top = top + cardTop;
-	}
-
-	blindCard.width = 200;
-	blindCard.height = 200;
-
-	blindCard.velocityX = 300;
-	cardElementArray.push(blindCard);
-	_this.cardLeft += CARD_INTERVAL;
-
-	
+	drawcard(_this, "seen", seenCardArray);
+	drawcard(_this, "blind", blindCardArray);	
 }
+
+function drawSeenCard() {
+
+	var _this = this._this;
+
+	blindCardArray = [];
+}
+
+// 绘制单个扑克牌
+// 描述精细化
+function drawcard(_this, type, graphArray) {
+
+		var left = _this.left;
+		var top = _this.top;
+
+		if (type === "seen") {
+			var index = getRandom({"start" : 0, "end": 51});
+			var card = new Graph('seenCard', new SpritePainter({"type" : "card", "image" : cardsImage, "width" : CARD_WIDTH, "height" : CARD_HEIGHT}), [ new moveXDistance(100), new spriteIt(index) ]);
+		} else if (type === "blind") {
+			var card = new Graph('blindCard', new ImagePainter(blindCardImage), [ new moveXDistance(100) ]);
+		} else {
+			var index = type;
+			var card = new Graph('seenCard', new SpritePainter({"type" : "card", "image" : cardsImage, "width" : CARD_WIDTH, "height" : CARD_HEIGHT}), [ new moveXDistance(100), new spriteIt(index) ]);
+		}
+
+		var cardLeft = _this.cardLeft;
+		var cardTop = _this.cardTop;
+		card.left = left + cardLeft;
+		card.top = top + cardTop;
+
+		if(cardLeft > 300) {
+
+			_this.cardLeft = _this.CARD_VIEW_LEFT;
+			cardLeft = _this.cardLeft;
+			_this.cardTop += 50;
+			cardTop = _this.cardTop;
+			card.left = left + cardLeft;
+			card.top = top + cardTop;
+		}
+
+		card.width = CARD_WIDTH;
+		card.height = CARD_HEIGHT;
+
+		card.velocityX = 300;
+
+		graphArray.push(card);
+
+		_this.cardLeft += CARD_INTERVAL;
+	};
 
 youCardView.addHandler("drawCard", drawOneCard)
 		   .addHandler("clear", function(args) {
-				cardElementArray = [];
+		   		// yourCardArray = [];
 				var _this = this._this;
 				_this.reset();
 		   });
@@ -333,15 +307,17 @@ youCardView.addHandler("drawCard", drawOneCard)
 		
 dealerCardView.addHandler("drawCard", drawOneCard)
 		   	  .addHandler("clear", function(args) {
-				cardElementArray = [];
+		   	  	// seenCardArray = [];
+		   	  	// blindCardArray = [];
 				var _this = this._this;
 				_this.reset();
 		   })
-		   	  .addHandler("drawBlindCard", drawBlindTwoCard);
+		   	  .addHandler("drawBlindCard", drawBlindTwoCard)
+		   	  .addHandler("drawSeenCard", drawSeenCard);
 
 youView.addHandler("drawCharacter", function(args) {
 
-				commonElementArray.you = null;
+				commonGraphArray.you = null;
 				var _this = this._this;
 				var index = args.index || 0;
 
@@ -349,12 +325,12 @@ youView.addHandler("drawCharacter", function(args) {
 				var character = new Graph('character', new SpritePainter({"image" : pandaImage, "width" : CHARACTER_WIDTH, "height" : CHARACTER_HEIGHT}), [ new spriteIt(index) ]);
 				character.top = _this.top + 0;
 				character.left = _this.left + 0;
-				commonElementArray.you = character;
+				commonGraphArray.you = character;
 		   });
 
 dealerView.addHandler("drawCharacter", function(args) {
 
-				commonElementArray.dealer = null;
+				commonGraphArray.dealer = null;
 				var _this = this._this;
 				var index = args.index || 0;
 
@@ -362,7 +338,7 @@ dealerView.addHandler("drawCharacter", function(args) {
 				var character = new Graph('character', new SpritePainter({"image" : rabbitImage, "width" : CHARACTER_WIDTH, "height" : CHARACTER_HEIGHT}), [ new spriteIt(index) ]);
 				character.top = _this.top + 0;
 				character.left = _this.left + 0;
-				commonElementArray.dealer = character;
+				commonGraphArray.dealer = character;
 		   });
 
 logic.send("youView_drawCharacter", {"index" : 0});
@@ -381,6 +357,23 @@ stand.onclick = function () {
 };
 
 
+function forEachGraph(array, time) {
+
+	if (array.constructor === Array) {
+
+		for(var i = 0, length = array.length; i < length; i++) {
+			array[i].update(context, time).paint(context);
+		}
+		
+	} else {
+		
+		for(var i in array) {
+			array[i].update(context, time).paint(context);
+		}
+	};
+	
+}
+
 var lastTime01 = 0
 function animate(time) {
 
@@ -391,19 +384,11 @@ function animate(time) {
 
 		context.clearRect(0, 0, canvas.width, canvas.height);
 
-		for(var i = 0; i < cardElementArray.length; i++) {
-			cardElementArray[i].update(context, time).paint(context);
-		}
+		forEachGraph(yourCardArray, time);
+		forEachGraph(seenCardArray, time);
+		forEachGraph(blindCardArray, time);
 
-		// console.log("cardElementArrayLength : " + cardElementArray.length);
-
-		var j = 0;
-		for(var i in commonElementArray) {
-			commonElementArray[i].update(context, time).paint(context);
-			j++;
-		}
-
-		// console.log("commmonElementArrayLength : " + j);
+		forEachGraph(commonGraphArray, time);
 
 		lastTime01 = time;
 	}
