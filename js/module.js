@@ -1,29 +1,35 @@
-var Module = function () {
+// 模型构造函数
+function Module () {
 
-	this.handlers = {};
 }
 
-Module.prototype = {
+// 设置mailbox
+Module.prototype.setMailBox = function (mailBox) {
 
-	on : function  (eventName, handler) {
+	this.mailBox = mailBox;
+}
 
-		if (typeof this.handlers[eventName] == "undefined") {
-			this.handlers[eventName] = [];
-		}
-		this.handlers[type].push(handler);
-	},
+// 发送消息
+Module.prototype.send = function (mailHead, args) {
 
-	fire : function (eventName, args) {
+	this.mailBox.push(mailHead, args);
+};
 
-		if (this.handlers[eventName] instanceof Array) {
-			var handlers = this.handlers[type];
-			for(var i = 0,length = handlers.length; i < length; i++) {
-				handlers[i](args);
-			}
-		}
-	},
+// 接受消息
+Module.prototype.receive = function (mailHead) {
 
-	toggle : function (targets, eventName, args) {
-		
+	var callbackName = mailHead.split("_")[1];
+
+	var callbackMap = this.callbackMap;
+
+	var mails = this.mailBox.pop(mailHead);
+	for (var i in mails) {
+
+		console.log(callbackName);
+		console.log(this.callbackMap)
+		console.log(callbackMap[callbackName]);
+		console.log(this);
+
+		this[callbackMap[callbackName]](mails[i]);
 	}
-}
+};

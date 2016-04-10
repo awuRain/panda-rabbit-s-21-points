@@ -77,3 +77,14 @@ function getRandom(range) {
      
     return result;
 }
+
+// 混合对象
+function extend(target, source) {
+    for (var p in source) {
+        if (source.hasOwnProperty(p)) {
+            target[p] = source[p];
+        }
+    }
+    
+    return target;
+};
