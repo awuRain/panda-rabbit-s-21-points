@@ -98,4 +98,13 @@ function animate(time) {
 	requestAnimFrame(animate);
 }
 
+
+var mailBox = new MailBox();
+var view1 = new View({"mailBox" : mailBox});
+var view2 = new View({"mailBox" : mailBox});
+
+view1.send("module2_doThing", {"arg1" : 1});
+view2.receive("module2_doThing");
+
+
 requestAnimFrame(animate);
