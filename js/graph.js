@@ -1,4 +1,4 @@
-var Sprite = function (name, painter, behaviors) {
+var Graph = function (name, painter, behaviors) {
 
 	if(name !== undefined) {
 		this.name = name;
@@ -21,7 +21,7 @@ var Sprite = function (name, painter, behaviors) {
 	return this;
 };
 
-Sprite.prototype = {
+Graph.prototype = {
 
 	paint: function (context) {
 		if (this.painter !== undefined && this.visible) {
@@ -37,6 +37,7 @@ Sprite.prototype = {
 		return this;
 	}
 };
+
 
 var Sprite = function (name, painter, behaviors) {
 

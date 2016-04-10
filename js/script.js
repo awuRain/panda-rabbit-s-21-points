@@ -40,20 +40,9 @@ var FPS = 35;
 var hit = document.getElementById("hit");
 var stand = document.getElementById("stand");
 
-var rabbit = new Sprite("rabbit", new ImagePainter("srcs/character/rabbit01.png"));
-rabbit.width = 156;
-rabbit.height = 156;
-rabbit.top = 300;
-
-var panda = new Sprite("panda", new ImagePainter("srcs/character/panda01.png"));
-panda.width = 200;
-panda.height = 200;
-panda.top = 300;
-panda.left = 600;
-
 var blackJackImgae = new Image();
 blackJackImgae.src = "srcs/pushLeft.png";
-var blackJack = new Sprite("blackJack", new ImagePainter(blackJackImgae));
+var blackJack = new Graph("blackJack", new ImagePainter(blackJackImgae));
 blackJack.width = 300;
 blackJack.height = 200;
 blackJack.top = 300;
@@ -63,14 +52,58 @@ blackJack.left = 150;
 // commonElementArray.push(panda);
 // commonElementArray.push(blackJack);
 
+
+// 中心信息
 var mailBox = new MailBox();
+
+
+
+// 各个视图定义
+var dealerCardView = new View({"mailBox" : mailBox, "left" : 0, "top" : 0});
+var youCardView = new View({"mailBox" : mailBox, "left" : 400, "top" : 0});
+var dealerView = new View({"mailBox" : mailBox, "left" : 0, "top" : 320});
+var youView = new View({"mailBox" : mailBox, "left" : 640, "top" : 320});
+var youInformationView = new View({"mailBox" : mailBox, "left" : 520, "top" : 420});
+
+youInformationView.addHandler("draw", function (args) {
+	var _this = this._this;
+
+	commonElementArray.information = null;
+
+	var texts = [
+		{"baseText" : "你当前的点数 : ", "text" : args.point},
+		{"baseText" : "你的筹码 : ", "text" : args.chip},
+	];
+
+	var information = new Graph("information", new TextPainter(texts));
+	information.left = _this.left;
+	information.top = _this.top;
+	commonElementArray.information = information;
+}).addHandler("reset", function (args) {
+
+	var _this = this._this;
+
+	commonElementArray.information = null;
+
+	var texts = [
+		{"baseText" : "你当前的点数 : ", "text" : 0},
+		{"baseText" : "你的筹码 : ", "text" : args.chip},
+	];
+
+	var information = new Graph("information", new TextPainter(texts));
+	information.left = _this.left;
+	information.top = _this.top;
+	commonElementArray.information = information;
+});
+
 
 var logic = new Logic({"mailBox" : mailBox});
 
 // 需要聚合
 var dealerCardViewLock = false;
 
-var youCardValueSum = 0
+var yourPoint = 0;
+var yourChip = 100;
 
 var cardVlueMap = {
 	1 : 1,
@@ -89,6 +122,7 @@ var cardVlueMap = {
 };
 
 var cardsArray = new Array(52);
+// 重置卡组
 cardsArray.reset = function () {
 	
 	for(var i = 0, length = this.length; i < length; i++) {
@@ -96,7 +130,6 @@ cardsArray.reset = function () {
 	}
 }
 cardsArray.reset();
-
 
 
 logic.addHandler("toggleHit", function(args) {
@@ -116,25 +149,33 @@ logic.addHandler("toggleHit", function(args) {
 
 
 	if(cardvalue === 1) {
-		if((youCardValueSum + 10) <= 21) {
+		if((yourPoint + 10) <= 21) {
 			cardvalue = 10;
 		} else {
 			cardvalue = 1;
 		}
 	};
 
-	youCardValueSum += cardvalue;
+	yourPoint += cardvalue;
 
-	if(youCardValueSum > 21) {
+	if(yourPoint > 21) {
 
 		logic.send("youView_drawCharacter", {"index" : 1});
 		youView.receive("youView_drawCharacter");
 		logic.send("dealerView_drawCharacter", {"index" : 3});
 		dealerView.receive("dealerView_drawCharacter");
 
-	} else if (youCardValueSum === 21) {
+		yourChip -= 10;
+		console.log(yourChip);
+
+	} else if (yourPoint === 21) {
 		
-	}
+		logic.send("youView_drawCharacter", {"index" : 4});
+		youView.receive("youView_drawCharacter");
+		logic.send("dealerView_drawCharacter", {"index" : 2});
+		dealerView.receive("dealerView_drawCharacter");
+
+	};
 
 	logic.send("youCardView_drawCard", {"index" : youCardIndex});
 
@@ -148,6 +189,10 @@ logic.addHandler("toggleHit", function(args) {
 	youCardView.receive("youCardView_drawCard");
 
 	dealerCardView.receive("dealearCardView_drawBlindCard");
+
+	logic.send("youInformationView_draw", {"point" : yourPoint, "chip" : yourChip});
+	youInformationView.receive("youInformationView_draw");
+
 }).addHandler("toggleStand", function(args) {
 	logic.send("youCardView_clear", {});
 	youCardView.receive("youCardView_clear");
@@ -161,10 +206,12 @@ logic.addHandler("toggleHit", function(args) {
 	logic.send("dealerView_drawCharacter", {"index" : 0});
 	dealerView.receive("dealerView_drawCharacter");
 
-	youCardValueSum = 0;
+	yourPoint = 0;
 
 	cardsArray.reset();
-})
+
+	youInformationView.toggle("reset", {"chip" : yourChip});
+});
 
 var cardsImage = new Image();
 cardsImage.src = "srcs/cards.png";
@@ -177,13 +224,6 @@ var rabbitImage = new Image();
 rabbitImage.src = "srcs/character/rabbit.png";
 
 
-
-var dealerCardView = new View({"mailBox" : mailBox, "left" : 0, "top" : 0});
-var youCardView = new View({"mailBox" : mailBox, "left" : 400, "top" : 0});
-
-
-var dealerView = new View({"mailBox" : mailBox, "left" : 0, "top" : 0});
-var youView = new View({"mailBox" : mailBox, "left" : 0, "top" : 0});
 
 
 function drawOneCard(args) {
@@ -198,7 +238,7 @@ function drawOneCard(args) {
 	var cardLeft = _this.cardLeft;
 	var cardTop = _this.cardTop;
 
-	var card02 = new Sprite('card02', new SpritePainter({"type" : "card", "image" : cardsImage, "width" : CARD_WIDTH, "height" : CARD_HEIGHT}), [ new moveXDistance(100), new spriteIt(index) ]);
+	var card02 = new Graph('card02', new SpritePainter({"type" : "card", "image" : cardsImage, "width" : CARD_WIDTH, "height" : CARD_HEIGHT}), [ new moveXDistance(100), new spriteIt(index) ]);
 	card02.left = left + cardLeft;
 	card02.top = top + cardTop;
 
@@ -232,7 +272,34 @@ function drawBlindTwoCard () {
 	var cardLeft = _this.cardLeft;
 	var cardTop = _this.cardTop;
 
-	var blindCard = new Sprite('blindCard', new ImagePainter(blindCardImage), [ new moveXDistance(100) ]);
+	var seenCard = new Graph('seenCard', new SpritePainter({"type" : "card", "image" : cardsImage, "width" : CARD_WIDTH, "height" : CARD_HEIGHT}), [ new moveXDistance(100), new spriteIt(index) ]);
+	seenCard.left = left + cardLeft;
+	seenCard.top = top + cardTop;
+
+	if(cardLeft > 300) {
+
+		_this.cardLeft = _this.CARD_VIEW_LEFT;
+		cardLeft = _this.cardLeft;
+		_this.cardTop += 50;
+		cardTop = _this.cardTop;
+		seenCard.left = left + cardLeft;
+		seenCard.top = top + cardTop;
+	}
+
+	seenCard.width = 200;
+	seenCard.height = 200;
+
+	seenCard.velocityX = 300;
+	cardElementArray.push(seenCard);
+	_this.cardLeft += CARD_INTERVAL;
+
+
+	left = _this.left;
+	top = _this.top;
+	cardLeft = _this.cardLeft;
+	cardTop = _this.cardTop;
+
+	var blindCard = new Graph('blindCard', new ImagePainter(blindCardImage), [ new moveXDistance(100) ]);
 	blindCard.left = left + cardLeft;
 	blindCard.top = top + cardTop;
 
@@ -253,32 +320,7 @@ function drawBlindTwoCard () {
 	cardElementArray.push(blindCard);
 	_this.cardLeft += CARD_INTERVAL;
 
-
-	left = _this.left;
-	top = _this.top;
-	cardLeft = _this.cardLeft;
-	cardTop = _this.cardTop;
-
-	var seenCard = new Sprite('seenCard', new SpritePainter({"type" : "card", "image" : cardsImage, "width" : CARD_WIDTH, "height" : CARD_HEIGHT}), [ new moveXDistance(100), new spriteIt(index) ]);
-	seenCard.left = left + cardLeft;
-	seenCard.top = top + cardTop;
-
-	if(cardLeft > 300) {
-
-		_this.cardLeft = _this.CARD_VIEW_LEFT;
-		cardLeft = _this.cardLeft;
-		_this.cardTop += 50;
-		cardTop = _this.cardTop;
-		seenCard.left = left + cardLeft;
-		seenCard.top = top + cardTop;
-	}
-
-	seenCard.width = 200;
-	seenCard.height = 200;
-
-	seenCard.velocityX = 300;
-	cardElementArray.push(seenCard);
-	_this.cardLeft += CARD_INTERVAL;
+	
 }
 
 youCardView.addHandler("drawCard", drawOneCard)
@@ -299,19 +341,27 @@ dealerCardView.addHandler("drawCard", drawOneCard)
 
 youView.addHandler("drawCharacter", function(args) {
 
+				commonElementArray.you = null;
+				var _this = this._this;
 				var index = args.index || 0;
-				var character = new Sprite('character', new SpritePainter({"image" : pandaImage, "width" : CHARACTER_WIDTH, "height" : CHARACTER_HEIGHT}), [ new spriteIt(index) ]);
-				character.top = 320;
-				character.left = 640;
+
+				// 抽离
+				var character = new Graph('character', new SpritePainter({"image" : pandaImage, "width" : CHARACTER_WIDTH, "height" : CHARACTER_HEIGHT}), [ new spriteIt(index) ]);
+				character.top = _this.top + 0;
+				character.left = _this.left + 0;
 				commonElementArray.you = character;
 		   });
 
 dealerView.addHandler("drawCharacter", function(args) {
 
+				commonElementArray.dealer = null;
+				var _this = this._this;
 				var index = args.index || 0;
-				var character = new Sprite('character', new SpritePainter({"image" : rabbitImage, "width" : CHARACTER_WIDTH, "height" : CHARACTER_HEIGHT}), [ new spriteIt(index) ]);
-				character.top = 320;
-				character.left = 0;
+
+				// 抽离
+				var character = new Graph('character', new SpritePainter({"image" : rabbitImage, "width" : CHARACTER_WIDTH, "height" : CHARACTER_HEIGHT}), [ new spriteIt(index) ]);
+				character.top = _this.top + 0;
+				character.left = _this.left + 0;
 				commonElementArray.dealer = character;
 		   });
 
@@ -322,12 +372,12 @@ dealerView.receive("dealerView_drawCharacter");
 
 hit.onclick = function () {
 
-	logic.toggle("logic_toggleHit", {});
+	logic.toggle("toggleHit", {});
 	
 };
 
 stand.onclick = function () {
-	logic.toggle("logic_toggleStand", {});
+	logic.toggle("toggleStand", {});
 };
 
 
@@ -345,7 +395,7 @@ function animate(time) {
 			cardElementArray[i].update(context, time).paint(context);
 		}
 
-		console.log("cardElementArrayLength : " + cardElementArray.length);
+		// console.log("cardElementArrayLength : " + cardElementArray.length);
 
 		var j = 0;
 		for(var i in commonElementArray) {
@@ -353,7 +403,7 @@ function animate(time) {
 			j++;
 		}
 
-		console.log("commmonElementArrayLength : " + j);
+		// console.log("commmonElementArrayLength : " + j);
 
 		lastTime01 = time;
 	}

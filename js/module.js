@@ -30,8 +30,9 @@ Module.prototype.receive = function (mailHead) {
 	}
 };
 
-Module.prototype.toggle = function (mailHead) {
-	this.send(mailHead, {});
+Module.prototype.toggle = function (mailHead, args) {
+	mailHead = "self_" + mailHead;
+	this.send(mailHead, args);
 	this.receive(mailHead);
 }
 
