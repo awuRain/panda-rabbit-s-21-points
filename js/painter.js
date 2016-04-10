@@ -1,3 +1,28 @@
+var TextPainter = function (texts) {
+
+	this.texts = texts;
+};
+
+TextPainter.prototype = {
+	paint: function (graph, context) {
+		var texts = this.texts;
+		for(var i = 0, length = texts.length; i < length; i++) {
+			var text = texts[i].baseText + texts[i].text;
+			context.save();
+			context.fillStyle ="#666";
+			context.textBaseline="top";
+			context.font = "14px Arial";
+
+			var textWidth = context.measureText(text).width;
+			var left = graph.left + 100 - textWidth;
+			var top = graph.top + i * 20;
+
+			context.fillText(text, left, top);
+			context.restore();
+		}
+	}
+};
+
 // 普通图片绘制器
 var ImagePainter = function (image) {
 
@@ -12,9 +37,9 @@ var ImagePainter = function (image) {
 };
 
 ImagePainter.prototype = {
-	paint: function (sprite, context) {
+	paint: function (graph, context) {
 		if(this.image.complete) {
-			context.drawImage(this.image, sprite.left, sprite.top, sprite.width, sprite.height);
+			context.drawImage(this.image, graph.left, graph.top, graph.width, graph.height);
 		}
 	}
 };
@@ -48,12 +73,12 @@ SpritePainter.prototype = {
 		}
 	},
 
-	paint: function (sprite, context) {
+	paint: function (graph, context) {
 
 		if(this.image.complete) {
 			var image = this.image;
 			var cell = this.cell;
-			context.drawImage(image, cell.x, cell.y, cell.w, cell.h, sprite.left, sprite.top, cell.w, cell.h);
+			context.drawImage(image, cell.x, cell.y, cell.w, cell.h, graph.left, graph.top, cell.w, cell.h);
 		}
 	}
 };
@@ -76,21 +101,21 @@ SpriteSheetPainter.prototype = {
 		}
 	},
 
-	beforePaint : function (sprite, context) {
+	beforePaint : function (graph, context) {
 		
 	},
 
-	paint: function(sprite, context) {
-		this.beforePaint(sprite, context);
+	paint: function(graph, context) {
+		this.beforePaint(graph, context);
 		if(this.spritesheet.complete) {
 			var cell = this.cells[this.cellIndex];
 			var spritesheet = this.spritesheet;
-			context.drawImage(spritesheet, cell.x, cell.y, cell.w, cell.h, sprite.left, sprite.top, cell.w, cell.h);
+			context.drawImage(spritesheet, cell.x, cell.y, cell.w, cell.h, graph.left, graph.top, cell.w, cell.h);
 		}
-		this.afterPaint(sprite, context);
+		this.afterPaint(graph, context);
 	},
 
-	afterPaint : function (sprite, context) {
+	afterPaint : function (graph, context) {
 
 	}
 };
