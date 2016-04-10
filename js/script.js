@@ -89,9 +89,15 @@ var cardVlueMap = {
 };
 
 var cardsArray = new Array(52);
-for(var i = 0, length = cardsArray.length; i < length; i++) {
-	cardsArray[i] = 1;
+cardsArray.reset = function () {
+	
+	for(var i = 0, length = this.length; i < length; i++) {
+		this[i] = 1;
+	}
 }
+cardsArray.reset();
+
+
 
 logic.addHandler("toggleHit", function(args) {
 
@@ -156,6 +162,8 @@ logic.addHandler("toggleHit", function(args) {
 	dealerView.receive("dealerView_drawCharacter");
 
 	youCardValueSum = 0;
+
+	cardsArray.reset();
 })
 
 var cardsImage = new Image();
@@ -337,9 +345,15 @@ function animate(time) {
 			cardElementArray[i].update(context, time).paint(context);
 		}
 
+		console.log("cardElementArrayLength : " + cardElementArray.length);
+
+		var j = 0;
 		for(var i in commonElementArray) {
 			commonElementArray[i].update(context, time).paint(context);
+			j++;
 		}
+
+		console.log("commmonElementArrayLength : " + j);
 
 		lastTime01 = time;
 	}
