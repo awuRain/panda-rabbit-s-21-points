@@ -1,7 +1,14 @@
 // 普通图片绘制器
-var ImagePainter = function (imageUrl) {
-	this.image = new Image();
-	this.image.src = imageUrl;
+var ImagePainter = function (image) {
+
+	// 根据image的类型进行加载图片
+	if(typeof image === "string") {
+		this.image = new Image();
+		this.image.src = image;
+	} else {
+		this.image = image;
+	}
+	
 };
 
 ImagePainter.prototype = {
@@ -28,7 +35,7 @@ SpritePainter.prototype = {
 		var y = this.IMAGE_HEIGHT * Math.floor(index/13);
 
 		// x位置索引
-		var x = this.IMAGE_HEIGHT * (index%13);
+		var x = this.IMAGE_WIDTH * (index%13);
 
 		this.cell = {"x" : x, "y" : y, "w" : this.IMAGE_WIDTH, "h" : this.IMAGE_HEIGHT};
 	},
