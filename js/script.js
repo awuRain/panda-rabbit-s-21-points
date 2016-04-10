@@ -48,27 +48,101 @@ panda.height = 200;
 panda.top = 300;
 panda.left = 600;
 
+var blackJackImgae = new Image();
+blackJackImgae.src = "srcs/pushLeft.png";
+var blackJack = new Sprite("blackJack", new ImagePainter(blackJackImgae));
+blackJack.width = 300;
+blackJack.height = 200;
+blackJack.top = 300;
+blackJack.left = 150;
+
 commonElementArray.push(rabbit);
 commonElementArray.push(panda);
+commonElementArray.push(blackJack);
 
 var mailBox = new MailBox();
 
 var logic = new Logic({"mailBox" : mailBox});
-logic.addHandler("toggleHit", function(args) {
-	logic.send("youCardView_drawCard", {})
-		 .send("dealearCardView_drawCard");
 
+// 需要聚合
+var dealerCardViewLock = false;
+
+var youCardValueSum = 0
+
+var cardVlueMap = {
+	1 : 1,
+	2 : 2,
+	3 : 3,
+	4 : 4,
+	5 : 5,
+	6 : 6,
+	7 : 7,
+	8 : 8,
+	9 : 9,
+	10 : 10,
+	11 : 10,
+	12 : 10,
+	13 : 10 
+};
+
+var cardsArray = new Array(52);
+for(var i = 0, length = cardsArray.length; i < length; i++) {
+	cardsArray[i] = 1;
+}
+
+logic.addHandler("toggleHit", function(args) {
+
+	var youCardIndex = getRandom({"start" : 0, "end": 51});;
+	while (cardsArray[youCardIndex] === 0) {
+		youCardIndex = getRandom({"start" : 0, "end": 51});
+	}
+	var cardvalue = cardVlueMap[youCardIndex%13+1];
+
+	cardsArray[youCardIndex] = 0;
+
+	// console.log("卡的实际值 : " + cardvalue);
+	// console.log("卡的数组索引 : " + youCardIndex);
+	// console.log("卡的纵向索引 : " + Math.floor(youCardIndex/13));
+	// console.log("卡的横向索引 : " + youCardIndex%13)
+
+	if(cardvalue === 1) {
+		if((youCardValueSum + 10) <= 21) {
+			cardvalue = 10;
+		} else {
+			cardvalue = 1;
+		}
+	};
+
+	youCardValueSum += cardvalue;
+
+	console.log(cardvalue);
+	console.log(youCardValueSum);
+
+	logic.send("youCardView_drawCard", {"index" : youCardIndex});
+
+	if (!dealerCardViewLock) {
+		var dealerCardIndex = getRandom({"start" : 0, "end": 51});
+		logic.send("dealearCardView_drawBlindCard");
+		dealerCardViewLock = true;
+	}
+	
 	youCardView.receive("youCardView_drawCard");
-	dealerCardView.receive("dealearCardView_drawCard");
+	// dealerCardView.receive("dealearCardView_drawCard");
+	dealerCardView.receive("dealearCardView_drawBlindCard");
 }).addHandler("toggleStand", function(args) {
 	logic.send("youCardView_clear", {});
 	youCardView.receive("youCardView_clear");
 	logic.send("delearCardView_clear", {});
 	dealerCardView.receive("delearCardView_clear");
+	dealerCardViewLock = false;
+
+	youCardValueSum = 0;
 })
 
 var cardsImage = new Image();
 cardsImage.src = "srcs/cards.png";
+var blindCardImage = new Image();
+blindCardImage.src = "srcs/back.png";
 
 var dealerCardView = new View({"mailBox" : mailBox, "left" : 0, "top" : 0});
 var youCardView = new View({"mailBox" : mailBox, "left" : 400, "top" : 0});
@@ -76,8 +150,9 @@ var youCardView = new View({"mailBox" : mailBox, "left" : 400, "top" : 0});
 
 function drawOneCard(args) {
 
-	var index = getRandom({"start" : 0, "end": 51});
+	var index = args["index"];
 
+	// 指向模块module
 	var _this = this._this
 
 	var left = _this.left;
@@ -101,9 +176,70 @@ function drawOneCard(args) {
 
 	card02.width = 200;
 	card02.height = 200;
-	
+
 	card02.velocityX = 300;
 	cardElementArray.push(card02);
+	_this.cardLeft += CARD_INTERVAL;
+}
+
+function drawBlindTwoCard () {
+
+	var index = getRandom({"start" : 0, "end": 51});
+
+	// 指向模块module
+	var _this = this._this
+
+	var left = _this.left;
+	var top = _this.top;
+	var cardLeft = _this.cardLeft;
+	var cardTop = _this.cardTop;
+
+	var blindCard = new Sprite('blindCard', new ImagePainter(blindCardImage), [ new moveXDistance(100) ]);
+	blindCard.left = left + cardLeft;
+	blindCard.top = top + cardTop;
+
+	if(cardLeft > 300) {
+
+		_this.cardLeft = _this.CARD_VIEW_LEFT;
+		cardLeft = _this.cardLeft;
+		_this.cardTop += 50;
+		cardTop = _this.cardTop;
+		blindCard.left = left + cardLeft;
+		blindCard.top = top + cardTop;
+	}
+
+	blindCard.width = 200;
+	blindCard.height = 200;
+
+	blindCard.velocityX = 300;
+	cardElementArray.push(blindCard);
+	_this.cardLeft += CARD_INTERVAL;
+
+
+	left = _this.left;
+	top = _this.top;
+	cardLeft = _this.cardLeft;
+	cardTop = _this.cardTop;
+
+	var seenCard = new Sprite('seenCard', new SpritePainter(cardsImage), [ new moveXDistance(100), new spriteIt(index) ]);
+	seenCard.left = left + cardLeft;
+	seenCard.top = top + cardTop;
+
+	if(cardLeft > 300) {
+
+		_this.cardLeft = _this.CARD_VIEW_LEFT;
+		cardLeft = _this.cardLeft;
+		_this.cardTop += 50;
+		cardTop = _this.cardTop;
+		seenCard.left = left + cardLeft;
+		seenCard.top = top + cardTop;
+	}
+
+	seenCard.width = 200;
+	seenCard.height = 200;
+
+	seenCard.velocityX = 300;
+	cardElementArray.push(seenCard);
 	_this.cardLeft += CARD_INTERVAL;
 }
 
@@ -112,14 +248,16 @@ youCardView.addHandler("drawCard", drawOneCard)
 				cardElementArray = [];
 				var _this = this._this;
 				_this.reset();
-});
-
+		   });
+		   
+		
 dealerCardView.addHandler("drawCard", drawOneCard)
 		   	  .addHandler("clear", function(args) {
 				cardElementArray = [];
 				var _this = this._this;
 				_this.reset();
-});
+		   })
+		   	  .addHandler("drawBlindCard", drawBlindTwoCard);
 
 hit.onclick = function () {
 
@@ -138,7 +276,7 @@ function animate(time) {
 	// 控制在一定fps之内
 	if(time - lastTime01 > (Math.round(1000 / FPS))) {
 
-		console.log(Math.round(1000 / (time - lastTime01)) + "fps");
+		// console.log(Math.round(1000 / (time - lastTime01)) + "fps");
 
 		context.clearRect(0, 0, canvas.width, canvas.height);
 
