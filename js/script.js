@@ -121,9 +121,13 @@ logic.addHandler("toggleHit", function(args) {
 
 	if(youCardValueSum > 21) {
 
+		logic.send("youView_drawCharacter", {"index" : 1});
+		youView.receive("youView_drawCharacter");
+		logic.send("dealerView_drawCharacter", {"index" : 3});
+		dealerView.receive("dealerView_drawCharacter");
 
 	} else if (youCardValueSum === 21) {
-
+		
 	}
 
 	logic.send("youCardView_drawCard", {"index" : youCardIndex});
@@ -135,17 +139,8 @@ logic.addHandler("toggleHit", function(args) {
 	}
 	
 
-	var youIndex = getRandom({"start" : 0, "end": 4});
-	var dealerIndex = getRandom({"start" : 0, "end": 4});
-
-	logic.send("youView_drawCharacter", {"index" : youIndex});
-	youView.receive("youView_drawCharacter");
-	logic.send("dealerView_drawCharacter", {"index" : dealerIndex});
-	dealerView.receive("dealerView_drawCharacter")
-
-
 	youCardView.receive("youCardView_drawCard");
-	// dealerCardView.receive("dealearCardView_drawCard");
+
 	dealerCardView.receive("dealearCardView_drawBlindCard");
 }).addHandler("toggleStand", function(args) {
 	logic.send("youCardView_clear", {});
@@ -153,6 +148,12 @@ logic.addHandler("toggleHit", function(args) {
 	logic.send("delearCardView_clear", {});
 	dealerCardView.receive("delearCardView_clear");
 	dealerCardViewLock = false;
+
+	//需要封装
+	logic.send("youView_drawCharacter", {"index" : 0});
+	youView.receive("youView_drawCharacter");
+	logic.send("dealerView_drawCharacter", {"index" : 0});
+	dealerView.receive("dealerView_drawCharacter");
 
 	youCardValueSum = 0;
 })
@@ -306,6 +307,10 @@ dealerView.addHandler("drawCharacter", function(args) {
 				commonElementArray.dealer = character;
 		   });
 
+logic.send("youView_drawCharacter", {"index" : 0});
+youView.receive("youView_drawCharacter");
+logic.send("dealerView_drawCharacter", {"index" : 0});
+dealerView.receive("dealerView_drawCharacter");
 
 hit.onclick = function () {
 

@@ -58,35 +58,6 @@ SpritePainter.prototype = {
 	}
 };
 
-// 需要聚合
-var SpritePainter1 = function (image) {
-	this.image = image;
-	this.IMAGE_WIDTH = 200;
-	this.IMAGE_HEIGHT = 200;
-};
-
-SpritePainter1.prototype = {
-
-	figure: function (index) {
-
-		// x位置索引
-		var x = this.IMAGE_WIDTH * (index);
-		var y = 0;
-
-		this.cell = {"x" : x, "y" : y, "w" : this.IMAGE_WIDTH, "h" : this.IMAGE_HEIGHT};
-	},
-
-	paint: function (sprite, context) {
-
-		if(this.image.complete) {
-			var image = this.image;
-			var cell = this.cell;
-			context.drawImage(image, cell.x, cell.y, cell.w, cell.h, sprite.left, sprite.top, cell.w, cell.h);
-		}
-	}
-};
-
-
 // 帧动画绘制器
 var SpriteSheetPainter = function (spritesheet, cells) {
 
