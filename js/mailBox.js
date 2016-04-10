@@ -10,7 +10,6 @@ MailBox.prototype.push = function (mailHead, args) {
 	if(!mailBox[mailHead]) {
 
 		mailBox[mailHead] = [];
-		mailBox[mailHead][0] = args;
 	}
 	mailBox[mailHead].push(args);
 };

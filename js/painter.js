@@ -14,9 +14,8 @@ ImagePainter.prototype = {
 
 
 // 雪碧图绘制器
-var SpritePainter = function (imageUrl) {
-	this.image = new Image();
-	this.image.src = imageUrl;
+var SpritePainter = function (image) {
+	this.image = image;
 	this.IMAGE_WIDTH = 200;
 	this.IMAGE_HEIGHT = 200;
 }
