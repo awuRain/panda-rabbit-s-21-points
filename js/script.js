@@ -319,6 +319,9 @@ logic.addHandler("toggleHit", function(args) {
 			var card = cardsArray.getCard();
 			var index = card.index;
 			var value = card.value;
+
+			console.log("initValue : " + value);
+
 			dealerPoint += value;
 			dealerCardView.toggle("drawBlindCard", {"index" : index});
 
@@ -341,6 +344,7 @@ logic.addHandler("toggleHit", function(args) {
 			var card = cardsArray.getCard();
 			var index = card.index;
 			dealerPoint += card.value;
+			console.log(card.value);
 			indexs.push(index);
 		};
 
@@ -348,16 +352,23 @@ logic.addHandler("toggleHit", function(args) {
 		dealerCardView.toggle("drawSeenCard", {"indexs" : indexs});
 
 		if (dealerPoint === yourPoint) {
+
+			console.log("push");
 		} else if (dealerPoint > 21) {
+			console.log("you win");
 			drawCharacter({"panda" : 3, "rabbit" : 1});
 			yourChip += chipValue;
 		} else if (dealerPoint == 21) {
+			console.log("you big lose");
 			drawCharacter({"panda" : 2, "rabbit" : 4});
 			yourChip -= chipValue * 2;
 		} else {
+			console.log("you lose");
 			drawCharacter({"panda" : 1, "rabbit" : 3});
 			yourChip -= chipValue;
 		}
+
+		console.log(dealerPoint);
 
 		doSettle();
 	}
@@ -379,12 +390,13 @@ function drawOneCard(args) {
 	drawcard(_this, index, yourCardArray);
 }
 
-function drawBlindTwoCard () {
+function drawBlindTwoCard (args) {
 
 	// 指向模块module
 	var _this = this._this
+	var index = args.index;
 
-	drawcard(_this, "seen", seenCardArray);
+	drawcard(_this, index, seenCardArray);
 	drawcard(_this, "blind", blindCardArray);	
 }
 
@@ -480,7 +492,7 @@ function animate(time) {
 	// 控制在一定fps之内
 	if(time - lastTime01 > (Math.round(1000 / FPS))) {
 
-		console.log(Math.round(1000 / (time - lastTime01)) + "fps");
+		// console.log(Math.round(1000 / (time - lastTime01)) + "fps");
 
 		context.clearRect(0, 0, canvas.width, canvas.height);
 
