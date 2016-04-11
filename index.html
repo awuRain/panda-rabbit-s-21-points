@@ -45,6 +45,23 @@
 			background: url(srcs/stand.png) no-repeat;
 			right: 0px;
 		}
+		
+		#play {
+			position: absolute;
+			top: 200px;
+			left: 100px;
+
+			width: 120px;
+			height: 52px;
+			border: none;
+			outline: none;
+
+			cursor: pointer;
+			z-index: 11;
+
+
+			background: url(srcs/play.png) no-repeat;
+		}
 
 	</style>
 </head>
@@ -52,6 +69,7 @@
 	<div id="wrapper">
 		<button id="hit"></button>
 		<button id="stand"></button>
+		<button id="play"></button>
 		<canvas id="canvas" width="800" height="500"></canvas>
 	</div>
 	
@@ -85,6 +103,11 @@
 		var stand = document.getElementById("stand");
 		addButtonAni(stand);
 
+		var play = document.getElementById("play");
+		addButtonAni(play);
+
 	</script>
 </body>
 </html>
+
+
