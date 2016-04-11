@@ -115,6 +115,15 @@ var cardsImage = loadImage("srcs/cards.png");
 var blindCardImage = loadImage("srcs/back.png");
 var pandaImage = loadImage("srcs/character/panda.png");
 var rabbitImage = loadImage("srcs/character/rabbit.png");
+var slashImage = loadImage("srcs/slash.png");
+
+var slash = new Graph("slash", new ImagePainter(slashImage));
+slash.width = 496;
+slash.height = 206;
+
+commonGraphArray.slash = slash;
+
+
 
 //
 //  图片资源加载
