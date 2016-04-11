@@ -88,3 +88,10 @@ function extend(target, source) {
     
     return target;
 };
+
+// 加载图片
+function loadImage(imageUrl) {
+	var image = new Image();
+	image.src = imageUrl;
+	return image;
+};
