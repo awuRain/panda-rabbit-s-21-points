@@ -26,7 +26,7 @@ var context = canvas.getContext("2d");
 
 var CARD_WIDTH = 200;
 var CARD_HEIGHT = 200;
-var CHARACTER_WIDTH = 156;
+var CHARACTER_WIDTH = 312;
 var CHARACTER_HEIGHT = 156;
 var CARD_INTERVAL = 50;
 var DANGER_POINT = 17;
@@ -117,11 +117,11 @@ var pandaImage = loadImage("srcs/character/panda.png");
 var rabbitImage = loadImage("srcs/character/rabbit.png");
 var slashImage = loadImage("srcs/slash.png");
 
-var slash = new Graph("slash", new ImagePainter(slashImage));
-slash.width = 496;
-slash.height = 206;
+// var slash = new Graph("slash", new ImagePainter(slashImage));
+// slash.width = 496;
+// slash.height = 206;
 
-commonGraphArray.slash = slash;
+// commonGraphArray.slash = slash;
 
 
 
@@ -136,8 +136,8 @@ var mailBox = new MailBox();
 var dealerCardView = new View({"mailBox" : mailBox, "left" : 0, "top" : 0});
 var yourCardView = new View({"mailBox" : mailBox, "left" : 400, "top" : 0});
 var dealerView = new View({"mailBox" : mailBox, "left" : 0, "top" : 320});
-var youView = new View({"mailBox" : mailBox, "left" : 640, "top" : 320});
-var youInformationView = new View({"mailBox" : mailBox, "left" : 520, "top" : 420});
+var youView = new View({"mailBox" : mailBox, "left" : 490, "top" : 320});
+var youInformationView = new View({"mailBox" : mailBox, "left" : 520, "top" : 440});
 
 //
 // 
@@ -145,35 +145,34 @@ var youInformationView = new View({"mailBox" : mailBox, "left" : 520, "top" : 42
 // 
 // 
 
+function drawText(graphName, texts, args, _this) {
+
+	commonGraphArray[graphName] = null;
+	var texts = texts;
+
+	var graph = new Graph("information", new TextPainter(texts));
+	graph.left = _this.left;
+	graph.top = _this.top;
+
+	commonGraphArray[graphName] = graph;
+};
+
 youInformationView.addHandler("draw", function (args) {
 	var _this = this._this;
 
-	commonGraphArray.information = null;
-
-	var texts = [
+	drawText("information", [
 		{"baseText" : "你当前的点数 : ", "text" : args.point},
-		{"baseText" : "你的筹码 : ", "text" : args.chip},
-	];
+		{"baseText" : "你的筹码 : ", "text" : args.chip}
+	], args, _this);
 
-	var information = new Graph("information", new TextPainter(texts));
-	information.left = _this.left;
-	information.top = _this.top;
-	commonGraphArray.information = information;
 }).addHandler("reset", function (args) {
 
 	var _this = this._this;
 
-	commonGraphArray.information = null;
-
-	var texts = [
+	drawText("information", [
 		{"baseText" : "你当前的点数 : ", "text" : 0},
-		{"baseText" : "你的筹码 : ", "text" : args.chip},
-	];
-
-	var information = new Graph("information", new TextPainter(texts));
-	information.left = _this.left;
-	information.top = _this.top;
-	commonGraphArray.information = information;
+		{"baseText" : "你的筹码 : ", "text" : args.chip}
+	], args, _this);
 });
 
 yourCardView.addHandler("drawCard", drawOneCard)
@@ -307,7 +306,7 @@ logic.addHandler("toggleHit", function(args) {
 
 		if(yourPoint > 21) {
 
-			drawCharacter({"panda" : 1, "rabbit" : 3});
+			drawCharacter({"panda" : 3, "rabbit" : 5});
 
 			yourChip -= chipValue;
 
@@ -315,7 +314,7 @@ logic.addHandler("toggleHit", function(args) {
 
 		} else if (yourPoint === 21) {
 			
-			drawCharacter({"panda" : 4, "rabbit" : 2});
+			drawCharacter({"panda" : 6, "rabbit" : 4});
 
 			yourChip += chipValue * 2;
 
@@ -362,18 +361,19 @@ logic.addHandler("toggleHit", function(args) {
 
 		if (dealerPoint === yourPoint) {
 
+			drawCharacter({"panda" : 1, "rabbit" : 1});
 			console.log("push");
 		} else if (dealerPoint > 21) {
 			console.log("you win");
-			drawCharacter({"panda" : 3, "rabbit" : 1});
+			drawCharacter({"panda" : 5, "rabbit" : 3});
 			yourChip += chipValue;
 		} else if (dealerPoint == 21) {
 			console.log("you big lose");
-			drawCharacter({"panda" : 2, "rabbit" : 4});
+			drawCharacter({"panda" : 4, "rabbit" : 6});
 			yourChip -= chipValue * 2;
 		} else {
 			console.log("you lose");
-			drawCharacter({"panda" : 1, "rabbit" : 3});
+			drawCharacter({"panda" : 2, "rabbit" : 5});
 			yourChip -= chipValue;
 		}
 
