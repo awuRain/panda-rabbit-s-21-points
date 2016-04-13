@@ -51,8 +51,10 @@ function doSettle () {
 
 var yourPoint = 0;
 var yourChip = 100;
-var chipValue = 10;
 var dealerPoint = 0;
+var dealerChip = 200;
+var chipValue = 10;
+
 
 var cardValueMap = {
 	1 : 1,
@@ -133,6 +135,7 @@ var yourCardView = new View({"mailBox" : mailBox, "left" : 400, "top" : 0});
 var dealerView = new View({"mailBox" : mailBox, "left" : 0, "top" : 320});
 var youView = new View({"mailBox" : mailBox, "left" : 490, "top" : 320});
 var youInformationView = new View({"mailBox" : mailBox, "left" : 520, "top" : 440});
+var dealerInfromationView = new View({"mailBox" : mailBox, "left" : 200, "top" : 440});
 
 //
 // 
@@ -152,10 +155,27 @@ function drawText(graphName, texts, args, _this) {
 	commonGraphArray[graphName] = graph;
 };
 
+dealerInfromationView.addHandler("draw", function (args) {
+
+	var _this = this._this;
+	drawText("dealerInformation", [
+		{"baseText" : "兔老板当前的点数 : ", "text" : args.point},
+		{"baseText" : "你的筹码 : ", "text" : args.chip}
+	], args, _this);
+
+}).addHandler("reset", function (args) {
+
+	var _this = this._this;
+	drawText("dealerInformation", [
+		{"baseText" : "兔老板当前的点数 : ", "text" : 0},
+		{"baseText" : "你的筹码 : ", "text" : args.chip}
+	], args, _this);
+})
+
 youInformationView.addHandler("draw", function (args) {
 	var _this = this._this;
 
-	drawText("information", [
+	drawText("yourInformation", [
 		{"baseText" : "你当前的点数 : ", "text" : args.point},
 		{"baseText" : "你的筹码 : ", "text" : args.chip}
 	], args, _this);
@@ -164,7 +184,7 @@ youInformationView.addHandler("draw", function (args) {
 
 	var _this = this._this;
 
-	drawText("information", [
+	drawText("yourInformation", [
 		{"baseText" : "你当前的点数 : ", "text" : 0},
 		{"baseText" : "你的筹码 : ", "text" : args.chip}
 	], args, _this);
@@ -268,6 +288,7 @@ logic.addHandler("toggleHit", function(args) {
 		cardsArray.reset();
 
 		youInformationView.toggle("reset", {"chip" : yourChip});
+		dealerInfromationView.toggle("reset", {"chip" : dealerChip});
 
 		standButtonLock = false;
 
@@ -304,6 +325,7 @@ logic.addHandler("toggleHit", function(args) {
 			drawCharacter({"panda" : 3, "rabbit" : 5});
 
 			yourChip -= chipValue;
+			dealerChip += chipValue;
 
 			doSettle();
 
@@ -311,7 +333,10 @@ logic.addHandler("toggleHit", function(args) {
 			
 			drawCharacter({"panda" : 6, "rabbit" : 4});
 
+			// function 的撒的撒
+
 			yourChip += chipValue * 2;
+			dealerChip -= chipValue * 2;
 
 			doSettle();
 		};
@@ -354,6 +379,7 @@ logic.addHandler("toggleHit", function(args) {
 		dealerCardView.toggle("clear");
 		dealerCardView.toggle("drawSeenCard", {"indexs" : indexs});
 
+		dealerInfromationView.toggle("draw", {"point" : dealerPoint, "chip" : dealerChip});
 		if (dealerPoint === yourPoint) {
 
 			drawCharacter({"panda" : 1, "rabbit" : 1});
@@ -362,17 +388,18 @@ logic.addHandler("toggleHit", function(args) {
 			console.log("you win");
 			drawCharacter({"panda" : 5, "rabbit" : 3});
 			yourChip += chipValue;
+			dealerChip -= chipValue;
 		} else if (dealerPoint == 21) {
 			console.log("you big lose");
 			drawCharacter({"panda" : 4, "rabbit" : 6});
 			yourChip -= chipValue * 2;
+			dealerChip += chipValue * 2;
 		} else {
 			console.log("you lose");
 			drawCharacter({"panda" : 2, "rabbit" : 5});
 			yourChip -= chipValue;
+			dealerChip += chipValue;
 		}
-
-		console.log(dealerPoint);
 
 		doSettle();
 	}
