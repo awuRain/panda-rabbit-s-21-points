@@ -41,7 +41,8 @@ var dealerCardViewLock = false;
 // 游戏中步骤
 // 0 为进行中,1 为结算中
 var step = 0;
-var standButtonLock = false;
+var standButtonLock = true;
+var hitButtonLock = true;
 
 function doSettle () {
 	step = 1;
@@ -105,6 +106,7 @@ var FPS = 35;
 
 var hitButton = document.getElementById("hit");
 var standButton = document.getElementById("stand");
+var playButton = document.getElementById("play");
 
 //
 // 图片资源加载
@@ -116,13 +118,6 @@ var blindCardImage = loadImage("srcs/back.png");
 var pandaImage = loadImage("srcs/character/panda.png");
 var rabbitImage = loadImage("srcs/character/rabbit.png");
 var slashImage = loadImage("srcs/slash.png");
-
-// var slash = new Graph("slash", new ImagePainter(slashImage));
-// slash.width = 496;
-// slash.height = 206;
-
-// commonGraphArray.slash = slash;
-
 
 
 //
@@ -468,14 +463,26 @@ youView.toggle("drawCharacter", {"index" : 0});
 dealerView.toggle("drawCharacter", {"index" : 0});
 
 hitButton.onclick = function () {
-
-	logic.toggle("toggleHit", {});
-	
+	if(!hitButtonLock) {
+		logic.toggle("toggleHit", {});
+	}
 };
 
 standButton.onclick = function () {
-	logic.toggle("toggleStand", {});
+	if(!standButtonLock) {
+		logic.toggle("toggleStand", {});
+	}
 };
+
+playButton.onclick = function () {
+
+	standButtonLock = false;
+	hitButtonLock = false;
+	delete commonGraphArray.slash;
+	slash = null;
+	logic.toggle("toggleHit", {});
+	this.style.display = "none";
+}
 
 
 function forEachGraph(array, time) {
@@ -494,6 +501,13 @@ function forEachGraph(array, time) {
 	};
 	
 }
+
+var slash = new Graph("slash", new ImagePainter(slashImage));
+slash.left = 130;
+slash.top = 50;
+slash.width = 548;
+slash.height = 406;
+commonGraphArray.slash = slash;
 
 var lastTime01 = 0
 function animate(time) {
