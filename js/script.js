@@ -265,11 +265,6 @@ function drawCharacter(args) {
 
 logic.addHandler("toggleHit", function(args) {
 
-	// console.log("卡的实际值 : " + cardvalue);
-	// console.log("卡的数组索引 : " + youCardIndex);
-	// console.log("卡的纵向索引 : " + Math.floor(youCardIndex/13));
-	// console.log("卡的横向索引 : " + youCardIndex%13);
-
 	// 处于游戏进行中
 	
 	if (step === 1) {
@@ -348,8 +343,6 @@ logic.addHandler("toggleHit", function(args) {
 			var index = card.index;
 			var value = card.value;
 
-			console.log("initValue : " + value);
-
 			dealerPoint += value;
 			dealerCardView.toggle("drawBlindCard", {"index" : index});
 
@@ -367,12 +360,15 @@ logic.addHandler("toggleHit", function(args) {
 	if (!standButtonLock) {
 
 		var indexs = [];
-		while((dealerPoint < yourPoint) || (dealerPoint === yourPoint && dealerPoint < DANGER_POINT) ) {
+
+		// 增加兔老板摸牌的不定性， 简单伪造兔老板猜牌过程
+		var refer = getRandom({"start" : -3, "end" : 3});
+
+		while(((dealerPoint < (yourPoint+refer)) && dealerPoint < 21) || (dealerPoint === yourPoint && dealerPoint < DANGER_POINT) ) {
 
 			var card = cardsArray.getCard();
 			var index = card.index;
 			dealerPoint += card.value;
-			console.log(card.value);
 			indexs.push(index);
 		};
 
@@ -383,20 +379,20 @@ logic.addHandler("toggleHit", function(args) {
 		if (dealerPoint === yourPoint) {
 
 			drawCharacter({"panda" : 1, "rabbit" : 1});
-			console.log("push");
 		} else if (dealerPoint > 21) {
-			console.log("you win");
 			drawCharacter({"panda" : 5, "rabbit" : 3});
 			yourChip += chipValue;
 			dealerChip -= chipValue;
 		} else if (dealerPoint == 21) {
-			console.log("you big lose");
 			drawCharacter({"panda" : 4, "rabbit" : 6});
 			yourChip -= chipValue * 2;
 			dealerChip += chipValue * 2;
-		} else {
-			console.log("you lose");
+		} else if (dealerPoint > yourPoint) {
 			drawCharacter({"panda" : 2, "rabbit" : 5});
+			yourChip -= chipValue;
+			dealerChip += chipValue;
+		} else if (dealerPoint < yourPoint) {
+			drawCharacter({"panda" : 5, "rabbit" : 3});
 			yourChip -= chipValue;
 			dealerChip += chipValue;
 		}
@@ -542,7 +538,7 @@ function animate(time) {
 	// 控制在一定fps之内
 	if(time - lastTime01 > (Math.round(1000 / FPS))) {
 
-		// console.log(Math.round(1000 / (time - lastTime01)) + "fps");
+		console.log("当前游戏的帧率 : " + Math.round(1000 / (time - lastTime01)) + "fps");
 
 		context.clearRect(0, 0, canvas.width, canvas.height);
 
