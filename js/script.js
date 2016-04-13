@@ -120,7 +120,20 @@ var blindCardImage = loadImage("srcs/back.png");
 var pandaImage = loadImage("srcs/character/panda.png");
 var rabbitImage = loadImage("srcs/character/rabbit.png");
 var slashImage = loadImage("srcs/slash.png");
+var winImage = loadImage("srcs/win.png");
+var loseImage = loadImage("srcs/lose.png");
 
+var win = new Graph("win", new ImagePainter(winImage));
+win.left = 300;
+win.top = 200;
+win.width = 232;
+win.height = 192;
+
+var lose = new Graph("lose", new ImagePainter(loseImage));
+lose.left = 300;
+lose.top = 200;
+lose.width = 232;
+lose.height = 192;
 
 //
 //  图片资源加载
@@ -256,10 +269,21 @@ var logic = new Logic({"mailBox" : mailBox});
 // 
 // 
 
-function drawCharacter(args) {
+function drawCharacter (args) {
 
 	youView.toggle("drawCharacter", {"index" : args.panda});
 	dealerView.toggle("drawCharacter", {"index" : args.rabbit});
+}
+
+function gameOver() {
+
+	if(yourChip <= 0) {
+
+	};
+
+	if(dealerChip <= 0) {
+
+	};
 }
 
 
@@ -353,6 +377,21 @@ logic.addHandler("toggleHit", function(args) {
 		youInformationView.toggle("draw", {"point" : yourPoint, "chip" : yourChip});
 	}
 
+	// 需要重新写
+	if(yourChip <= 0) {
+		console.log("lose");
+		commonGraphArray.win = win;
+		play.style.display = "block";
+		hitButtonLock = true;
+		standButtonLock = true;
+	} 
+	if(dealerChip <= 0) {
+		console.log("win");
+		commonGraphArray.lose = lose;
+		play.style.display = "block";
+		hitButtonLock = true;
+		standButtonLock = true;
+	}
 	
 
 }).addHandler("toggleStand", function(args) {
@@ -406,6 +445,22 @@ logic.addHandler("toggleHit", function(args) {
 		}
 
 		doSettle();
+
+		// 需要重新写
+		if(yourChip <= 0) {
+			console.log("lose");
+			commonGraphArray.win = win;
+			play.style.display = "block";
+			hitButtonLock = true;
+			standButtonLock = true;
+		} 
+		if(dealerChip <= 0) {
+			console.log("win");
+			commonGraphArray.lose = lose;
+			play.style.display = "block";
+			hitButtonLock = true;
+			standButtonLock = true;
+		}
 	}
 });
 
@@ -506,13 +561,20 @@ standButton.onclick = function () {
 };
 
 playButton.onclick = function () {
-
-	standButtonLock = false;
-	hitButtonLock = false;
+	
 	delete commonGraphArray.slash;
 	slash = null;
 	logic.toggle("toggleHit", {});
 	this.style.display = "none";
+
+	yourChip = 100;
+	dealerChip = 200;
+
+	delete commonGraphArray.win;
+	delete commonGraphArray.lose;
+
+	standButtonLock = false;
+	hitButtonLock = false;
 }
 
 
