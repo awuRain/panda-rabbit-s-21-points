@@ -364,6 +364,14 @@ logic.addHandler("toggleHit", function(args) {
 		// 增加兔老板摸牌的不定性， 简单伪造兔老板猜牌过程
 		var refer = getRandom({"start" : -3, "end" : 3});
 
+		// 需要统一调用
+		(function () {
+			var card = cardsArray.getCard();
+			var index = card.index;
+			dealerPoint += card.value;
+			indexs.push(index);
+		})()
+
 		while(((dealerPoint < (yourPoint+refer)) && dealerPoint < 21) || (dealerPoint === yourPoint && dealerPoint < DANGER_POINT) ) {
 
 			var card = cardsArray.getCard();
