@@ -124,16 +124,16 @@ var winImage = loadImage("srcs/win.png");
 var loseImage = loadImage("srcs/lose.png");
 
 var win = new Graph("win", new ImagePainter(winImage));
-win.left = 300;
-win.top = 200;
-win.width = 232;
-win.height = 192;
+win.left = 200;
+win.top = 100;
+win.width = 389;
+win.height = 324;
 
 var lose = new Graph("lose", new ImagePainter(loseImage));
-lose.left = 300;
-lose.top = 200;
-lose.width = 232;
-lose.height = 192;
+lose.left = 200;
+lose.top = 100;
+lose.width = 389;
+lose.height = 324;
 
 //
 //  图片资源加载
@@ -180,7 +180,7 @@ dealerInfromationView.addHandler("draw", function (args) {
 
 	var _this = this._this;
 	drawText("dealerInformation", [
-		{"baseText" : "兔老板当前的点数 : ", "text" : 0},
+		{"baseText" : "兔老板当前的点数 : ", "text" : "-"},
 		{"baseText" : "你的筹码 : ", "text" : args.chip}
 	], args, _this);
 })
@@ -380,14 +380,14 @@ logic.addHandler("toggleHit", function(args) {
 	// 需要重新写
 	if(yourChip <= 0) {
 		console.log("lose");
-		commonGraphArray.win = win;
+		commonGraphArray.lose = lose;
 		play.style.display = "block";
 		hitButtonLock = true;
 		standButtonLock = true;
 	} 
 	if(dealerChip <= 0) {
 		console.log("win");
-		commonGraphArray.lose = lose;
+		commonGraphArray.win = win;
 		play.style.display = "block";
 		hitButtonLock = true;
 		standButtonLock = true;
@@ -449,14 +449,15 @@ logic.addHandler("toggleHit", function(args) {
 		// 需要重新写
 		if(yourChip <= 0) {
 			console.log("lose");
-			commonGraphArray.win = win;
+			commonGraphArray.lose = lose;
 			play.style.display = "block";
 			hitButtonLock = true;
 			standButtonLock = true;
 		} 
 		if(dealerChip <= 0) {
+			console.log(dealerChip);
 			console.log("win");
-			commonGraphArray.lose = lose;
+			commonGraphArray.win = win;
 			play.style.display = "block";
 			hitButtonLock = true;
 			standButtonLock = true;
