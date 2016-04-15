@@ -49,10 +49,19 @@ function doSettle () {
 	standButtonLock = true;
 }
 
+// 你的当前点数
 var yourPoint = 0;
+
+// 你的筹码数
 var yourChip = 100;
+
+// 对方当前点数
 var dealerPoint = 0;
+
+// 对方的筹码数
 var dealerChip = 200;
+
+// 单个筹码大小
 var chipValue = 10;
 
 
@@ -274,18 +283,6 @@ function drawCharacter (args) {
 	youView.toggle("drawCharacter", {"index" : args.panda});
 	dealerView.toggle("drawCharacter", {"index" : args.rabbit});
 }
-
-function gameOver() {
-
-	if(yourChip <= 0) {
-
-	};
-
-	if(dealerChip <= 0) {
-
-	};
-}
-
 
 logic.addHandler("toggleHit", function(args) {
 
@@ -576,25 +573,7 @@ playButton.onclick = function () {
 
 	standButtonLock = false;
 	hitButtonLock = false;
-}
-
-
-function forEachGraph(array, time) {
-
-	if (array.constructor === Array) {
-
-		for(var i = 0, length = array.length; i < length; i++) {
-			array[i].update(context, time).paint(context);
-		}
-		
-	} else {
-		
-		for(var i in array) {
-			array[i].update(context, time).paint(context);
-		}
-	};
-	
-}
+};
 
 var slash = new Graph("slash", new ImagePainter(slashImage));
 slash.left = 130;

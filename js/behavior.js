@@ -1,3 +1,4 @@
+// 帧动画播放动作
 var run = {
 
  	INTERVAL : 1000,
@@ -11,6 +12,7 @@ var run = {
 	}
 };
 
+// 根据index切割出相应的雪碧图
 var spriteIt = function (index) {
 
 	this.execute = function (sprite, context, now) {
@@ -20,6 +22,7 @@ var spriteIt = function (index) {
 	return this;
 };
 
+// 从右向左的动作
 var moveToLeft = {
 
 	lastTime: 0,
@@ -36,11 +39,13 @@ var moveToLeft = {
 };
 
 // 删除当前动作 behaviors
+// 可以让动作结束之后自己将自己析构
 function detachBehavior (sprite, behaviors) {
 	sprite.behaviors.remove(behaviors);
 }
 
 // 随具体做水平移动
+// distance控制平移距离，arrow控制平移方向 
 var moveXDistance = function(distance, arrow) {
 
 	var leftDistance = distance;
@@ -76,6 +81,7 @@ var moveXDistance = function(distance, arrow) {
 };
 
 // 随时间做水平移动
+// duration控制平移持续时间，arrow控制平移方向
 var moveXTime = function(duration, arrow) {
 
 	var animationTimer = new AnimationTimer(duration);

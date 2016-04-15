@@ -95,3 +95,21 @@ function loadImage(imageUrl) {
 	image.src = imageUrl;
 	return image;
 };
+
+// 迭代图形数组中的每个graph
+function forEachGraph(array, time) {
+
+	if (array.constructor === Array) {
+
+		for(var i = 0, length = array.length; i < length; i++) {
+			array[i].update(context, time).paint(context);
+		}
+		
+	} else {
+		
+		for(var i in array) {
+			array[i].update(context, time).paint(context);
+		}
+	};
+	
+}
