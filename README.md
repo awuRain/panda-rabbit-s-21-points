@@ -10,3 +10,7 @@
 这个游戏感觉只是刚开始，虽然已经可以开始玩了，但是还是存在一些bug，而且值得完善的地方真的很多很多，到后来其实越做越有劲了，觉得这个项目其实对于我来说已经不仅仅是一个作业了，我之后依旧可以继续迭代这个项目，并且把它放在github上，好好维护构建起这个项目。
 
 其实所给的时间已经非常充裕，但是我却因为其他事情不能一心一意好好完成，暂且实现到这个程度。
+
+![进入游戏界面](https://raw.githubusercontent.com/awuRain/panda-rabbit-s-21-points/master/other/QQ20170628-1%402x.jpg)
+
+![游戏界面](https://raw.githubusercontent.com/awuRain/panda-rabbit-s-21-points/master/other/QQ20170628-2%402x.jpg)
